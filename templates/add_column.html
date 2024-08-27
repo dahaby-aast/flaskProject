@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Add Column{% endblock %}
+{% block content %}
+<h1>Add Location Column</h1>
+<form method="post" enctype="multipart/form-data">
+    <label for="prefix">File Name Prefix:</label>
+    <input type="text" id="prefix" name="prefix" required><br>
+    <label>Upload 6 Files:</label>
+    <input type="file" name="files" multiple required><br>
+    <label>Location for Each File:</label>
+    <input type="text" name="location" required><br>
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

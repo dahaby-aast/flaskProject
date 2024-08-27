@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Main Dashboard</h1>
+<h2>Download Processed Files</h2>
+<ul>
+    {% for filename in filenames %}
+        <li><a href="{{ url_for('download_file', filename=filename) }}">{{ filename }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
