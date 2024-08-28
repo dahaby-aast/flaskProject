@@ -4,20 +4,29 @@ from tkinter import Tk, Toplevel, filedialog, messagebox, simpledialog, Listbox
 import os
 import pandas as pd
 import warnings
-
 warnings.filterwarnings("ignore", category=SyntaxWarning)
+
+from tkinter import PhotoImage
+
 class DashboardApp:
     def __init__(self, root):
         self.root = root
         self.current_theme = "cosmo"  # Default theme
         self.root.title("Dashboard")
-        self.root.geometry("400x450")
+        self.root.geometry("400x460")
         self.root.resizable(True, True)
         self.create_widgets()
 
     def create_widgets(self):
+        # Load the logo image
+        self.logo = PhotoImage(file="")  # Replace with the path to your logo image
+
+        # Display the logo
+        logo_label = ttk.Label(self.root, image=self.logo)
+        logo_label.pack(pady=10)
+
         # Title Label
-        ttk.Label(self.root, text="Main Dashboard",
+        ttk.Label(self.root, text="My Dashboard",
                   font=("Helvetica", 18, "bold"), bootstyle="primary").pack(pady=20)
 
         # Button to open AddColumnApp
@@ -43,6 +52,18 @@ class DashboardApp:
         # Exit Button
         ttk.Button(self.root, text="Exit", command=self.root.quit,
                    bootstyle=DANGER).pack(pady=10, padx=20, fill="x")
+
+        status_bar = ttk.Label(self.root,
+                               text="Все права защищены @ Дахаби 2024",
+                               font=("Helvetica", 13, "bold"),
+                               bootstyle="secondary",
+                               anchor="w",
+                               padding=(10, 5),
+                               background="#2C3E50",
+                               # Dark blue-grey background
+                               foreground="#ECF0F1")  # Light grey text color
+
+        status_bar.pack(side="bottom", fill="x")
 
     def open_add_column_app(self):
         self.root.iconify()  # Minimize the dashboard
