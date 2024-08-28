@@ -59,9 +59,9 @@ class DashboardApp:
                                bootstyle="secondary",
                                anchor="w",
                                padding=(10, 5),
-                               background="#2C3E50",
+                               background="#abbdd1",
                                # Dark blue-grey background
-                               foreground="#ECF0F1")  # Light grey text color
+                               foreground="#292f35")  # Light grey text color
 
         status_bar.pack(side="bottom", fill="x")
 
