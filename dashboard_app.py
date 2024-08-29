@@ -17,7 +17,6 @@ class DashboardApp:
         self.root.geometry("400x720")
         self.root.resizable(True, True)
         self.create_widgets()
-
     def create_widgets(self):
         # Load the logo image
         self.logo = PhotoImage(file="uploads\\logo1.png")  # Replace with the path to your logo image
