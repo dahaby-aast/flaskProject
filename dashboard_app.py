@@ -4,6 +4,7 @@ from tkinter import Tk, Toplevel, filedialog, messagebox, simpledialog, Listbox
 import os
 import pandas as pd
 import warnings
+from datetime import datetime
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 from tkinter import PhotoImage
@@ -13,13 +14,13 @@ class DashboardApp:
         self.root = root
         self.current_theme = "cosmo"  # Default theme
         self.root.title("Dashboard")
-        self.root.geometry("400x460")
+        self.root.geometry("400x720")
         self.root.resizable(True, True)
         self.create_widgets()
 
     def create_widgets(self):
         # Load the logo image
-        self.logo = PhotoImage(file="")  # Replace with the path to your logo image
+        self.logo = PhotoImage(file="uploads\\logo1.png")  # Replace with the path to your logo image
 
         # Display the logo
         logo_label = ttk.Label(self.root, image=self.logo)
@@ -28,6 +29,36 @@ class DashboardApp:
         # Title Label
         ttk.Label(self.root, text="My Dashboard",
                   font=("Helvetica", 18, "bold"), bootstyle="primary").pack(pady=20)
+
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        date_frame = ttk.Frame(self.root, bootstyle="info")
+        date_frame.pack(pady=10, padx=20, fill="x")
+
+        self.date_label = ttk.Label(
+            date_frame,
+            text=f"Date: {current_date}",
+            font=("Helvetica", 14, "bold"),
+            bootstyle="light",
+            background="#282c34",  # Dark background color
+            foreground="#e06e14"  # Light blue font color
+        )
+        self.date_label.pack(padx=10, pady=5)
+
+        # Time Label (Digital Clock)
+        time_frame = ttk.Frame(self.root, bootstyle="info")
+        time_frame.pack(pady=10, padx=20, fill="x")
+
+        self.time_label = ttk.Label(
+            time_frame,
+            text="",
+            font=("Helvetica", 14, "bold"),
+            bootstyle="light",
+            background="#282c34",  # Dark background color
+            foreground="#98c379"  # Green font color
+        )
+        self.time_label.pack(padx=10, pady=5)
+
+        self.update_time()
 
         # Button to open AddColumnApp
         ttk.Button(self.root, text="Open Add Column App",
@@ -53,17 +84,22 @@ class DashboardApp:
         ttk.Button(self.root, text="Exit", command=self.root.quit,
                    bootstyle=DANGER).pack(pady=10, padx=20, fill="x")
 
+        # Status Bar
         status_bar = ttk.Label(self.root,
                                text="Все права защищены @ Дахаби 2024",
                                font=("Helvetica", 13, "bold"),
                                bootstyle="secondary",
                                anchor="w",
                                padding=(10, 5),
-                               background="#abbdd1",
-                               # Dark blue-grey background
+                               background="#abbdd1",  # Dark blue-grey background
                                foreground="#292f35")  # Light grey text color
 
         status_bar.pack(side="bottom", fill="x")
+
+    def update_time(self):
+        current_time = datetime.now().strftime("%H:%M:%S")
+        self.time_label.config(text=f"Time: {current_time}")
+        self.root.after(1000, self.update_time)  # Update every second
 
     def open_add_column_app(self):
         self.root.iconify()  # Minimize the dashboard
@@ -114,7 +150,7 @@ class AddColumnApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Add Column to Multiple Excel Files")
-        self.root.geometry("600x800")
+        self.root.geometry("700x800")
         self.root.resizable(True, True)
         self.file_paths = [None] * 6
         self.text_entries = [ttk.StringVar() for _ in range(6)]
