@@ -12,7 +12,7 @@ from tkinter import PhotoImage
 class DashboardApp:
     def __init__(self, root):
         self.root = root
-        self.current_theme = "cosmo"  # Default theme
+        self.current_theme = "darkly"  # Default theme
         self.root.title("Dashboard")
         self.root.geometry("400x720")
         self.root.resizable(True, True)
@@ -38,8 +38,7 @@ class DashboardApp:
             text=f"Date: {current_date}",
             font=("Helvetica", 14, "bold"),
             bootstyle="light",
-            background="#282c34",  # Dark background color
-            foreground="#e06e14"  # Light blue font color
+            foreground="#fdfdfd"  # Light blue font color
         )
         self.date_label.pack(padx=10, pady=5)
 
@@ -52,8 +51,7 @@ class DashboardApp:
             text="",
             font=("Helvetica", 14, "bold"),
             bootstyle="light",
-            background="#282c34",  # Dark background color
-            foreground="#98c379"  # Green font color
+            foreground="#fdfdfd"  # Green font color
         )
         self.time_label.pack(padx=10, pady=5)
 
@@ -322,6 +320,6 @@ class FileCombinerApp:
         self.file_listbox.delete(0, 'end')
 
 if __name__ == "__main__":
-    root = ttk.Window(themename="cosmo")
+    root = ttk.Window(themename="darkly")
     app = DashboardApp(root)
     root.mainloop()
