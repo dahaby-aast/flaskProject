@@ -5,7 +5,7 @@ a = Analysis(
     ['dashboard_app.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('uploads/logo1.png', 'uploads')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

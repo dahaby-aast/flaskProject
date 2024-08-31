@@ -1,6 +1,9 @@
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from tkinter import Tk, Toplevel, filedialog, messagebox, simpledialog, Listbox
+from tkinter import Tk, PhotoImage
+import sys
 import os
 import pandas as pd
 import warnings
@@ -8,6 +11,18 @@ from datetime import datetime
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 from tkinter import PhotoImage
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 class DashboardApp:
     def __init__(self, root):
@@ -17,9 +32,10 @@ class DashboardApp:
         self.root.geometry("400x720")
         self.root.resizable(True, True)
         self.create_widgets()
+
     def create_widgets(self):
         # Load the logo image
-        self.logo = PhotoImage(file="uploads\\logo1.png")  # Replace with the path to your logo image
+        self.logo = PhotoImage(file=resource_path("uploads/logo1.png"))
 
         # Display the logo
         logo_label = ttk.Label(self.root, image=self.logo)
@@ -38,6 +54,7 @@ class DashboardApp:
             text=f"Date: {current_date}",
             font=("Helvetica", 14, "bold"),
             bootstyle="light",
+            background="#303030",
             foreground="#fdfdfd"  # Light blue font color
         )
         self.date_label.pack(padx=10, pady=5)
@@ -51,6 +68,7 @@ class DashboardApp:
             text="",
             font=("Helvetica", 14, "bold"),
             bootstyle="light",
+            background="#303030",
             foreground="#fdfdfd"  # Green font color
         )
         self.time_label.pack(padx=10, pady=5)
