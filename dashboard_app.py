@@ -68,8 +68,7 @@ class DashboardApp:
             text="",
             font=("Helvetica", 14, "bold"),
             bootstyle="light",
-            background="#303030",
-            foreground="#fdfdfd"  # Green font color
+           foreground="#fdfdfd"  # Green font color
         )
         self.time_label.pack(padx=10, pady=5)
 
@@ -106,7 +105,6 @@ class DashboardApp:
                                bootstyle="secondary",
                                anchor="w",
                                padding=(10, 5),
-                               background="#abbdd1",  # Dark blue-grey background
                                foreground="#292f35")  # Light grey text color
 
         status_bar.pack(side="bottom", fill="x")
