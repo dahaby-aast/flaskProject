@@ -54,7 +54,7 @@ class DashboardApp:
         ttk.Button(self.root, text="Exit", command=self.root.quit, bootstyle=DANGER).pack(pady=10, padx=20, fill="x")
 
         ttk.Label(self.root, text="Все права защищены @ Дахаби 2024", font=("Helvetica", 13, "bold"),
-                  bootstyle="secondary", anchor="w", padding=(10, 5), foreground="#292f35").pack(side="bottom", fill="x")
+                  bootstyle="secondary", anchor="w", padding=(10, 5), foreground="#8D9FB1").pack(side="bottom", fill="x")
 
     def update_time(self):
         self.time_label.config(text=f"Time: {datetime.now().strftime('%H:%M:%S')}")
@@ -115,11 +115,11 @@ class AddColumnApp:
             file_frame = ttk.Frame(frame)
             file_frame.grid(row=0, column=0, padx=(0, 10), sticky="w")
             ttk.Button(file_frame, text=f"Upload File {i + 1}", command=lambda i=i: self.upload_file(i), bootstyle=INFO).pack(side=LEFT)
-            label = ttk.Label(file_frame, text="No file selected", bootstyle=SECONDARY, anchor="w")
+            label = ttk.Label(file_frame, text="No file selected", bootstyle=SECONDARY, anchor="w",font=("Helvetica", 12, "bold"), padding=(10, 0,0,0))
             label.pack(side=LEFT, fill="x", expand=True)
             setattr(self, f'file{i + 1}_label', label)
 
-            self.records_labels[i] = ttk.Label(file_frame, text="Records: N/A", bootstyle=SECONDARY, anchor="w")
+            self.records_labels[i] = ttk.Label(file_frame, text="Records: N/A",font=("Helvetica", 12, "bold"), bootstyle=SECONDARY, anchor="w")
             self.records_labels[i].pack(side=LEFT, padx=(10, 0))
 
             column_frame = ttk.Frame(frame)
@@ -173,7 +173,7 @@ class AddColumnApp:
     def clear(self):
         self.file_paths = [None] * 6
         for i in range(6):
-            getattr(self, f'file{i + 1}_label').config(text="No file selected")
+            getattr(self, f'file{i + 1}_label').config(text="No file selected",font=("Helvetica", 12, "bold"))
             self.text_entries[i].set("")
             self.records_labels[i].config(text="Records: N/A")
 
