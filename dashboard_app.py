@@ -40,26 +40,28 @@ class DashboardApp:
         ttk.Label(self.root, image=self.logo).pack(pady=10)
         ttk.Label(self.root, text="My Dashboard", font=("Helvetica", 14, "bold"), bootstyle="primary").pack(pady=20)
 
-        current_date = datetime.now().strftime("%Y-%m-%d")
+        current_date = datetime.now().strftime("%d-%m-%Y")
 
-        # Create a date frame using the 'info' bootstyle, which will adapt to the current theme
+        # Create a frame for date
         date_frame = ttk.Frame(root, bootstyle="info")
         date_frame.pack(pady=10, padx=20, fill="x")
+        # Date Label
+        self.date_label = ttk.Label(date_frame, text=f"Date: {current_date}",
+                                    font=("Helvetica", 12, "bold"),
+                                    bootstyle="inverse-info")
+        self.date_label.pack(pady=5)
 
-        # Create a date label with a default font and an adaptive style that works with all themes
-        self.date_label = ttk.Label(
-            date_frame,
-            text=f"Date: {current_date}",
-            font=("Helvetica", 12, "bold"),
-            bootstyle="inverse-info"
-        )
-        self.date_label.pack(padx=10, pady=5)
-
-        time_frame = ttk.Frame(self.root, bootstyle="info")
+        # Create a frame for time
+        time_frame = ttk.Frame(root, bootstyle="info")
         time_frame.pack(pady=10, padx=20, fill="x")
-        self.time_label = ttk.Label(time_frame, text="", font=("Helvetica", 12, "bold"), bootstyle="light", foreground="#fdfdfd")
-        self.time_label.pack(padx=10, pady=5)
 
+        # Time Label
+        self.time_label = ttk.Label(time_frame, text="",
+                                    font=("Helvetica", 12, "bold"),
+                                    bootstyle="inverse-info")
+        self.time_label.pack(pady=5)
+
+        # Start updating time
         self.update_time()
 
         ttk.Button(self.root, text="Open Add Column App", command=self.open_add_column_app, bootstyle=SUCCESS).pack(pady=10, padx=20, fill="x")
