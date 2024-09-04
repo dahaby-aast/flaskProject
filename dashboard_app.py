@@ -21,27 +21,43 @@ class DashboardApp:
         self.style = ttk.Style()  # Create a ttkbootstrap Style object
         self.current_theme = "darkly"
         self.style.theme_use(self.current_theme)  # Apply the initial theme
+        self.create_custom_styles()  # Apply custom styles
         self.root.title("Dashboard")
         self.root.geometry("400x720")
         self.root.resizable(True, True)
         self.create_widgets()
 
+    def create_custom_styles(self):
+        # Custom styles to apply to all themes
+        self.style.configure("TButton", font=("Helvetica", 12, "bold"))
+        self.style.configure("TLabel",
+                             #background="#303030",
+                             foreground="#fdfdfd")
+        #self.style.configure("TFrame", background="#303030")
+
     def create_widgets(self):
         self.logo = ttk.PhotoImage(file=resource_path("uploads/logo1.png"))
         ttk.Label(self.root, image=self.logo).pack(pady=10)
-        ttk.Label(self.root, text="My Dashboard", font=("Helvetica", 18, "bold"), bootstyle="primary").pack(pady=20)
+        ttk.Label(self.root, text="My Dashboard", font=("Helvetica", 14, "bold"), bootstyle="primary").pack(pady=20)
 
         current_date = datetime.now().strftime("%Y-%m-%d")
-        date_frame = ttk.Frame(self.root, bootstyle="info")
+
+        # Create a date frame using the 'info' bootstyle, which will adapt to the current theme
+        date_frame = ttk.Frame(root, bootstyle="info")
         date_frame.pack(pady=10, padx=20, fill="x")
 
-        self.date_label = ttk.Label(date_frame, text=f"Date: {current_date}", font=("Helvetica", 14, "bold"),
-                                    bootstyle="light", background="#303030", foreground="#fdfdfd")
+        # Create a date label with a default font and an adaptive style that works with all themes
+        self.date_label = ttk.Label(
+            date_frame,
+            text=f"Date: {current_date}",
+            font=("Helvetica", 12, "bold"),
+            bootstyle="inverse-info"
+        )
         self.date_label.pack(padx=10, pady=5)
 
         time_frame = ttk.Frame(self.root, bootstyle="info")
         time_frame.pack(pady=10, padx=20, fill="x")
-        self.time_label = ttk.Label(time_frame, text="", font=("Helvetica", 14, "bold"), bootstyle="light", foreground="#fdfdfd")
+        self.time_label = ttk.Label(time_frame, text="", font=("Helvetica", 12, "bold"), bootstyle="light", foreground="#fdfdfd")
         self.time_label.pack(padx=10, pady=5)
 
         self.update_time()
@@ -49,11 +65,10 @@ class DashboardApp:
         ttk.Button(self.root, text="Open Add Column App", command=self.open_add_column_app, bootstyle=SUCCESS).pack(pady=10, padx=20, fill="x")
         ttk.Button(self.root, text="Open File Combiner App", command=self.open_file_combiner_app, bootstyle=INFO).pack(pady=10, padx=20, fill="x")
         ttk.Button(self.root, text="Open File", command=self.open_file, bootstyle=PRIMARY).pack(pady=10, padx=20, fill="x")
-        ttk.Button(self.root, text="Dark Mode", command=self.toggle_theme, bootstyle=WARNING).pack(pady=10, padx=20, fill="x")
-        ttk.Button(self.root, text="Change Theme Color", command=self.change_theme_color, bootstyle=INFO).pack(pady=10, padx=20, fill="x")
+        ttk.Button(self.root, text="Toggle Theme", command=self.toggle_theme, bootstyle=WARNING).pack(pady=10, padx=20, fill="x")
         ttk.Button(self.root, text="Exit", command=self.root.quit, bootstyle=DANGER).pack(pady=10, padx=20, fill="x")
 
-        ttk.Label(self.root, text="Все права защищены @ Дахаби 2024", font=("Helvetica", 13, "bold"),
+        ttk.Label(self.root, text="Все права защищены @ Дахаби 2024", font=("Helvetica", 12, "bold"),
                   bootstyle="secondary", anchor="w", padding=(10, 5), foreground="#8D9FB1").pack(side="bottom", fill="x")
 
     def update_time(self):
@@ -87,18 +102,27 @@ class DashboardApp:
         self.root.deiconify()
 
     def toggle_theme(self):
-        self.current_theme = "darkly" if self.current_theme == "cosmo" else "cosmo"
-        self.style.theme_use(self.current_theme)  # Use the style object to change theme
+        # Define available themes
+        available_themes = ["sandstone", "flatly", "darkly", "cosmo", "minty", "superhero"]  # Add more as needed
+        # Toggle between themes
+        if self.current_theme in available_themes:
+            index = available_themes.index(self.current_theme)
+            self.current_theme = available_themes[(index + 1) % len(available_themes)]
+        else:
+            self.current_theme = available_themes[0]
 
-    def change_theme_color(self):
-        self.style.theme_use("minty")  # Change theme using the style object
+        try:
+            self.style.theme_use(self.current_theme)
+            self.create_custom_styles()  # Reapply custom styles after theme change
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while changing theme: {e}")
 
 
 class AddColumnApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Add Column to Multiple Excel Files")
-        self.root.geometry("700x800")
+        self.root.geometry("900x600")
         self.root.resizable(True, True)
         self.file_paths = [None] * 6
         self.text_entries = [ttk.StringVar() for _ in range(6)]
@@ -106,7 +130,7 @@ class AddColumnApp:
         self.create_widgets()
 
     def create_widgets(self):
-        ttk.Label(self.root, text="Add 'Location' Column to Excel Files", font=("Helvetica", 18, "bold"), bootstyle="primary").grid(row=0, column=0, columnspan=3, pady=20)
+        ttk.Label(self.root, text="Add 'Location' Column to Excel Files", font=("Helvetica", 12, "bold"), bootstyle="primary").grid(row=0, column=0, columnspan=3, pady=20)
 
         for i in range(6):
             frame = ttk.Frame(self.root, borderwidth=2, relief="flat")
@@ -115,11 +139,11 @@ class AddColumnApp:
             file_frame = ttk.Frame(frame)
             file_frame.grid(row=0, column=0, padx=(0, 10), sticky="w")
             ttk.Button(file_frame, text=f"Upload File {i + 1}", command=lambda i=i: self.upload_file(i), bootstyle=INFO).pack(side=LEFT)
-            label = ttk.Label(file_frame, text="No file selected", bootstyle=SECONDARY, anchor="w",font=("Helvetica", 12, "bold"), padding=(10, 0,0,0))
+            label = ttk.Label(file_frame, text="No file selected", bootstyle=SECONDARY, anchor="w", font=("Helvetica", 12, "bold"), padding=(10, 0, 0, 0))
             label.pack(side=LEFT, fill="x", expand=True)
             setattr(self, f'file{i + 1}_label', label)
 
-            self.records_labels[i] = ttk.Label(file_frame, text="Records: N/A",font=("Helvetica", 12, "bold"), bootstyle=SECONDARY, anchor="w")
+            self.records_labels[i] = ttk.Label(file_frame, text="Records: N/A", font=("Helvetica", 12, "bold"), bootstyle=SECONDARY, anchor="w")
             self.records_labels[i].pack(side=LEFT, padx=(10, 0))
 
             column_frame = ttk.Frame(frame)
@@ -152,54 +176,58 @@ class AddColumnApp:
             df = pd.read_excel(self.file_paths[index])
             self.records_labels[index].config(text=f"Records: {len(df)}")
         except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while reading {os.path.basename(self.file_paths[index])}: {e}")
-
-    def add_column_to_files(self):
-        if None in self.file_paths:
-            messagebox.showwarning("Incomplete Selection", "Please upload all files before proceeding.")
-            return
-
-        for i, file_path in enumerate(self.file_paths):
-            if file_path:
-                try:
-                    df = pd.read_excel(file_path)
-                    df['Location'] = self.text_entries[i].get()
-                    output_file = f"{os.path.splitext(file_path)[0]}_updated.xlsx"
-                    df.to_excel(output_file, index=False)
-                    messagebox.showinfo("Success", f"Column added successfully to {os.path.basename(file_path)}.")
-                except Exception as e:
-                    messagebox.showerror("Error", f"An error occurred while processing {os.path.basename(file_path)}: {e}")
+            messagebox.showerror("Error", f"Could not read the file: {e}")
+            self.records_labels[index].config(text="Records: N/A")
 
     def clear(self):
-        self.file_paths = [None] * 6
         for i in range(6):
-            getattr(self, f'file{i + 1}_label').config(text="No file selected",font=("Helvetica", 12, "bold"))
-            self.text_entries[i].set("")
+            self.file_paths[i] = None
+            getattr(self, f'file{i + 1}_label').config(text="No file selected")
             self.records_labels[i].config(text="Records: N/A")
+            self.text_entries[i].set('')
+
+    def add_column_to_files(self):
+        for i in range(6):
+            if self.file_paths[i]:
+                try:
+                    df = pd.read_excel(self.file_paths[i])
+                    df['Location'] = self.text_entries[i].get()
+                    save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", initialfile=os.path.basename(self.file_paths[i]))
+                    df.to_excel(save_path, index=False)
+                except Exception as e:
+                    messagebox.showerror("Error", f"An error occurred while processing the file: {e}")
 
 
 class FileCombinerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("File Combiner")
-        self.root.geometry("700x800")
+        self.root.title("Combine Excel Files")
+        self.root.geometry("900x600")
         self.root.resizable(True, True)
         self.file_paths = []
         self.create_widgets()
 
     def create_widgets(self):
-        ttk.Label(self.root, text="Combine Multiple Excel Files", font=("Helvetica", 18, "bold"), bootstyle="primary").grid(row=0, column=0, columnspan=3, pady=20)
+        ttk.Label(self.root, text="Combine Excel Files", font=("Helvetica", 12, "bold"), bootstyle="primary").grid(row=0, column=0, columnspan=2, pady=20)
 
-        upload_button = ttk.Button(self.root, text="Upload Files", command=self.upload_files, bootstyle=INFO)
-        upload_button.grid(row=1, column=0, columnspan=3, pady=10, padx=20)
+        file_frame = ttk.Frame(self.root, borderwidth=2, relief="flat")
+        file_frame.grid(row=1, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
 
-        self.files_listbox = Listbox(self.root, selectmode="multiple", font=("Helvetica", 10), width=70, height=10)
-        self.files_listbox.grid(row=2, column=0, columnspan=3, pady=10, padx=20)
+        upload_frame = ttk.Frame(file_frame)
+        upload_frame.grid(row=0, column=0, sticky="w")
+        self.listbox = Listbox(upload_frame, height=6)
+        self.listbox.pack(side=LEFT, padx=10)
+        scrollbar = ttk.Scrollbar(upload_frame, orient="vertical", command=self.listbox.yview)
+        scrollbar.pack(side=LEFT, fill="y")
+        self.listbox.config(yscrollcommand=scrollbar.set)
 
-        ttk.Button(self.root, text="Combine Files", command=self.combine_files, bootstyle=SUCCESS).grid(row=3, column=0, columnspan=3, pady=10, padx=20)
+        ttk.Button(upload_frame, text="Upload Files", command=self.upload_files, bootstyle=INFO).pack(side=LEFT, padx=(10, 0))
+        self.records_label = ttk.Label(file_frame, text="Records: N/A", font=("Helvetica", 12, "bold"), bootstyle=SECONDARY, anchor="w")
+        self.records_label.pack(side=LEFT, padx=(10, 0))
 
+        ttk.Button(self.root, text="Combine Files", command=self.combine_files, bootstyle=SUCCESS).grid(row=2, column=0, columnspan=2, pady=10, padx=20)
         button_frame = ttk.Frame(self.root)
-        button_frame.grid(row=4, column=0, columnspan=3, pady=10, padx=20, sticky="ew")
+        button_frame.grid(row=3, column=0, columnspan=2, pady=10, padx=20, sticky="ew")
         ttk.Button(button_frame, text="Clear", command=self.clear, bootstyle=WARNING).pack(side=LEFT, fill="x", expand=True, padx=5)
         ttk.Button(button_frame, text="Exit", command=self.root.destroy, bootstyle=DANGER).pack(side=LEFT, fill="x", expand=True, padx=5)
 
@@ -207,38 +235,40 @@ class FileCombinerApp:
         files = filedialog.askopenfilenames(title="Select Excel Files", filetypes=[("Excel files", "*.xlsx *.xls")])
         if files:
             self.file_paths = list(files)
-            self.files_listbox.delete(0, "end")
+            self.listbox.delete(0, 'end')
             for file in files:
-                self.files_listbox.insert("end", os.path.basename(file))
+                self.listbox.insert('end', os.path.basename(file))
+            self.update_record_count()
 
-    def combine_files(self):
-        if not self.file_paths:
-            messagebox.showwarning("No Files Selected", "Please upload files before proceeding.")
-            return
-
-        combined_data = []
-        for file_path in self.file_paths:
-            try:
-                df = pd.read_excel(file_path)
-                combined_data.append(df)
-            except Exception as e:
-                messagebox.showerror("Error", f"An error occurred while reading {os.path.basename(file_path)}: {e}")
-                return
-
-        if combined_data:
-            combined_df = pd.concat(combined_data)
-            combined_df.sort_values(by="RegNum", inplace=True)
-            combined_df.drop(columns=["Email"], inplace=True, errors="ignore")
-            output_file = "Combined_File.xlsx"
-            try:
-                combined_df.to_excel(output_file, index=False)
-                messagebox.showinfo("Success", f"Files combined successfully into {output_file}.")
-            except Exception as e:
-                messagebox.showerror("Error", f"An error occurred while saving the combined file: {e}")
+    def update_record_count(self):
+        total_records = 0
+        try:
+            for file in self.file_paths:
+                df = pd.read_excel(file)
+                total_records += len(df)
+            self.records_label.config(text=f"Records: {total_records}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not read one of the files: {e}")
+            self.records_label.config(text="Records: N/A")
 
     def clear(self):
         self.file_paths = []
-        self.files_listbox.delete(0, "end")
+        self.listbox.delete(0, 'end')
+        self.records_label.config(text="Records: N/A")
+
+    def combine_files(self):
+        combined_df = pd.DataFrame()
+        try:
+            for file in self.file_paths:
+                df = pd.read_excel(file)
+                combined_df = pd.concat([combined_df, df])
+            combined_df.sort_values(by=["RegNum"], inplace=True)
+            combined_df.drop(columns=["Email"], inplace=True, errors='ignore')
+            save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", initialfile="combined_file.xlsx")
+            combined_df.to_excel(save_path, index=False)
+            messagebox.showinfo("Success", "Files have been combined and saved successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred while combining the files: {e}")
 
 
 if __name__ == "__main__":
