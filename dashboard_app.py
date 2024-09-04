@@ -210,31 +210,59 @@ class FileCombinerApp:
         self.create_widgets()
 
     def create_widgets(self):
-        ttk.Label(self.root, text="Combine Excel Files", font=("Helvetica", 12, "bold"), bootstyle="primary").grid(row=0, column=0, columnspan=2, pady=20)
+        ttk.Label(self.root, text="Combine Excel Files",
+                  font=("Helvetica", 12, "bold"), bootstyle="primary").grid(
+            row=0, column=0, columnspan=2, pady=20)
 
         file_frame = ttk.Frame(self.root, borderwidth=2, relief="flat")
-        file_frame.grid(row=1, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
+        file_frame.grid(row=1, column=0, columnspan=2, pady=10, padx=10,
+                        sticky="ew")
 
         upload_frame = ttk.Frame(file_frame)
         upload_frame.grid(row=0, column=0, sticky="w")
+
+        # Listbox with Scrollbar
         self.listbox = Listbox(upload_frame, height=6)
-        self.listbox.pack(side=LEFT, padx=10)
-        scrollbar = ttk.Scrollbar(upload_frame, orient="vertical", command=self.listbox.yview)
-        scrollbar.pack(side=LEFT, fill="y")
+        self.listbox.grid(row=0, column=0, padx=10)
+        scrollbar = ttk.Scrollbar(upload_frame, orient="vertical",
+                                  command=self.listbox.yview)
+        scrollbar.grid(row=0, column=1, sticky="ns")
         self.listbox.config(yscrollcommand=scrollbar.set)
 
-        ttk.Button(upload_frame, text="Upload Files", command=self.upload_files, bootstyle=INFO).pack(side=LEFT, padx=(10, 0))
-        self.records_label = ttk.Label(file_frame, text="Records: N/A", font=("Helvetica", 12, "bold"), bootstyle=SECONDARY, anchor="w")
-        self.records_label.pack(side=LEFT, padx=(10, 0))
+        # Upload Button
+        ttk.Button(upload_frame, text="Upload Files",
+                   command=self.upload_files, bootstyle="info").grid(row=0,
+                                                                     column=2,
+                                                                     padx=(
+                                                                     10, 0))
 
-        ttk.Button(self.root, text="Combine Files", command=self.combine_files, bootstyle=SUCCESS).grid(row=2, column=0, columnspan=2, pady=10, padx=20)
+        # Records Label
+        self.records_label = ttk.Label(file_frame, text="Records: N/A",
+                                       font=("Helvetica", 12, "bold"),
+                                       bootstyle="secondary", anchor="w")
+        self.records_label.grid(row=1, column=0, padx=(10, 0), pady=10)
+
+        # Combine Files Button
+        ttk.Button(self.root, text="Combine Files", command=self.combine_files,
+                   bootstyle="success").grid(row=2, column=0, columnspan=2,
+                                             pady=10, padx=20)
+
+        # Button Frame for Clear and Exit
         button_frame = ttk.Frame(self.root)
-        button_frame.grid(row=3, column=0, columnspan=2, pady=10, padx=20, sticky="ew")
-        ttk.Button(button_frame, text="Clear", command=self.clear, bootstyle=WARNING).pack(side=LEFT, fill="x", expand=True, padx=5)
-        ttk.Button(button_frame, text="Exit", command=self.root.destroy, bootstyle=DANGER).pack(side=LEFT, fill="x", expand=True, padx=5)
+        button_frame.grid(row=3, column=0, columnspan=2, pady=10, padx=20,
+                          sticky="ew")
+
+        ttk.Button(button_frame, text="Clear", command=self.clear,
+                   bootstyle="warning").grid(row=0, column=0, padx=5,
+                                             sticky="ew")
+        ttk.Button(button_frame, text="Exit", command=self.root.destroy,
+                   bootstyle="danger").grid(row=0, column=1, padx=5,
+                                            sticky="ew")
 
     def upload_files(self):
-        files = filedialog.askopenfilenames(title="Select Excel Files", filetypes=[("Excel files", "*.xlsx *.xls")])
+        files = filedialog.askopenfilenames(title="Select Excel Files",
+                                            filetypes=[("Excel files",
+                                                        "*.xlsx *.xls")])
         if files:
             self.file_paths = list(files)
             self.listbox.delete(0, 'end')
@@ -250,7 +278,8 @@ class FileCombinerApp:
                 total_records += len(df)
             self.records_label.config(text=f"Records: {total_records}")
         except Exception as e:
-            messagebox.showerror("Error", f"Could not read one of the files: {e}")
+            messagebox.showerror("Error",
+                                 f"Could not read one of the files: {e}")
             self.records_label.config(text="Records: N/A")
 
     def clear(self):
@@ -266,11 +295,14 @@ class FileCombinerApp:
                 combined_df = pd.concat([combined_df, df])
             combined_df.sort_values(by=["RegNum"], inplace=True)
             combined_df.drop(columns=["Email"], inplace=True, errors='ignore')
-            save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", initialfile="combined_file.xlsx")
+            save_path = filedialog.asksaveasfilename(defaultextension=".xlsx",
+                                                     initialfile="combined_file.xlsx")
             combined_df.to_excel(save_path, index=False)
-            messagebox.showinfo("Success", "Files have been combined and saved successfully.")
+            messagebox.showinfo("Success",
+                                "Files have been combined and saved successfully.")
         except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while combining the files: {e}")
+            messagebox.showerror("Error",
+                                 f"An error occurred while combining the files: {e}")
 
 
 if __name__ == "__main__":
