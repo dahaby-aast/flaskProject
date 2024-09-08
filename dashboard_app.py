@@ -245,7 +245,7 @@ class FileCombinerApp:
         # Combine Files Button
         ttk.Button(self.root, text="Combine Files", command=self.combine_files,
                    bootstyle="success").grid(row=2, column=0, columnspan=2,
-                                             pady=10, padx=20)
+                                             pady=20, padx=10)
 
         # Button Frame for Clear and Exit
         button_frame = ttk.Frame(self.root)
