@@ -6,6 +6,9 @@ import os
 import pandas as pd
 import warnings
 from datetime import datetime
+from openpyxl import Workbook
+from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl.utils.dataframe import dataframe_to_rows
 
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
@@ -30,10 +33,7 @@ class DashboardApp:
     def create_custom_styles(self):
         # Custom styles to apply to all themes
         self.style.configure("TButton", font=("Helvetica", 12, "bold"))
-        self.style.configure("TLabel",
-                             #background="#303030",
-                             foreground="#fdfdfd")
-        #self.style.configure("TFrame", background="#303030")
+        self.style.configure("TLabel", foreground="#fdfdfd")
 
     def create_widgets(self):
         self.logo = ttk.PhotoImage(file=resource_path("uploads/logo1.png"))
@@ -42,27 +42,19 @@ class DashboardApp:
 
         current_date = datetime.now().strftime("%d-%m-%Y")
 
-        # Create a frame for date
-        date_frame = ttk.Frame(root, bootstyle="info")
+        # Date and Time Frames
+        date_frame = ttk.Frame(self.root, bootstyle="info")
         date_frame.pack(pady=10, padx=20, fill="x")
-        # Date Label
         self.date_label = ttk.Label(date_frame, text=f"Date: {current_date}",
-                                    font=("Helvetica", 12, "bold"),
-                                    bootstyle="inverse-info")
+                                    font=("Helvetica", 12, "bold"), bootstyle="inverse-info")
         self.date_label.pack(pady=5)
 
-        # Create a frame for time
-        time_frame = ttk.Frame(root, bootstyle="info")
+        time_frame = ttk.Frame(self.root, bootstyle="info")
         time_frame.pack(pady=10, padx=20, fill="x")
-
-        # Time Label
-        self.time_label = ttk.Label(time_frame, text="",
-                                    font=("Helvetica", 12, "bold"),
-                                    bootstyle="inverse-info")
+        self.time_label = ttk.Label(time_frame, text="", font=("Helvetica", 12, "bold"), bootstyle="inverse-info")
         self.time_label.pack(pady=5)
 
-        # Start updating time
-        self.update_time()
+        self.update_time()  # Start updating time
 
         ttk.Button(self.root, text="Open Add Column App", command=self.open_add_column_app, bootstyle=SUCCESS).pack(pady=10, padx=20, fill="x")
         ttk.Button(self.root, text="Open File Combiner App", command=self.open_file_combiner_app, bootstyle=INFO).pack(pady=10, padx=20, fill="x")
@@ -104,20 +96,11 @@ class DashboardApp:
         self.root.deiconify()
 
     def toggle_theme(self):
-        # Define available themes
-        available_themes = ["sandstone", "flatly", "darkly", "cosmo", "minty", "superhero"]  # Add more as needed
-        # Toggle between themes
-        if self.current_theme in available_themes:
-            index = available_themes.index(self.current_theme)
-            self.current_theme = available_themes[(index + 1) % len(available_themes)]
-        else:
-            self.current_theme = available_themes[0]
-
-        try:
-            self.style.theme_use(self.current_theme)
-            self.create_custom_styles()  # Reapply custom styles after theme change
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while changing theme: {e}")
+        available_themes = ["sandstone", "flatly", "darkly", "cosmo", "minty", "superhero"]
+        index = available_themes.index(self.current_theme)
+        self.current_theme = available_themes[(index + 1) % len(available_themes)]
+        self.style.theme_use(self.current_theme)
+        self.create_custom_styles()
 
 
 class AddColumnApp:
@@ -178,131 +161,140 @@ class AddColumnApp:
             df = pd.read_excel(self.file_paths[index])
             self.records_labels[index].config(text=f"Records: {len(df)}")
         except Exception as e:
-            messagebox.showerror("Error", f"Could not read the file: {e}")
-            self.records_labels[index].config(text="Records: N/A")
+            messagebox.showerror("Error", f"An error occurred while reading file {index + 1}: {e}")
+
+    def add_column_to_files(self):
+        if not any(self.file_paths):
+            messagebox.showwarning("Warning", "No files selected.")
+            return
+
+        # Ask for the prefix only once
+        prefix = simpledialog.askstring("Input",
+                                        "Enter the prefix for the saved files:")
+        if not prefix:
+            messagebox.showwarning("Warning", "No prefix provided.")
+            return
+
+        try:
+            for i, file_path in enumerate(self.file_paths):
+                if file_path:
+                    df = pd.read_excel(file_path)
+                    df['Location'] = self.text_entries[i].get()
+
+                    # Automatically save the file using the prefix and the original filename
+                    original_file_name = os.path.basename(file_path)
+                    new_file_name = f"{prefix}_{original_file_name}"
+                    new_file_path = os.path.join(os.path.dirname(file_path),
+                                                 new_file_name)
+                    df.to_excel(new_file_path, index=False)
+
+            # Show a single success message after all files are saved
+            messagebox.showinfo("Success",
+                                "All files have been saved successfully.")
+
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
 
     def clear(self):
         for i in range(6):
             self.file_paths[i] = None
             getattr(self, f'file{i + 1}_label').config(text="No file selected")
             self.records_labels[i].config(text="Records: N/A")
-            self.text_entries[i].set('')
-
-    def add_column_to_files(self):
-        for i in range(6):
-            if self.file_paths[i]:
-                try:
-                    df = pd.read_excel(self.file_paths[i])
-                    df['Location'] = self.text_entries[i].get()
-                    save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", initialfile=os.path.basename(self.file_paths[i]))
-                    df.to_excel(save_path, index=False)
-                except Exception as e:
-                    messagebox.showerror("Error", f"An error occurred while processing the file: {e}")
+            self.text_entries[i].set("")
 
 
 class FileCombinerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Combine Excel Files")
-        self.root.geometry("900x600")
+        self.root.geometry("600x400")
         self.root.resizable(True, True)
         self.file_paths = []
         self.create_widgets()
 
     def create_widgets(self):
-        ttk.Label(self.root, text="Combine Excel Files",
-                  font=("Helvetica", 12, "bold"), bootstyle="primary").grid(
-            row=0, column=0, columnspan=2, pady=20)
+        ttk.Label(self.root, text="Combine Excel Files", font=("Helvetica", 12, "bold"), bootstyle="primary").pack(pady=20)
 
-        file_frame = ttk.Frame(self.root, borderwidth=2, relief="flat")
-        file_frame.grid(row=1, column=0, columnspan=2, pady=10, padx=10,
-                        sticky="ew")
+        self.listbox = Listbox(self.root, selectmode="multiple", height=10, width=80)
+        self.listbox.pack(pady=10, padx=20)
 
-        upload_frame = ttk.Frame(file_frame)
-        upload_frame.grid(row=0, column=0, sticky="w")
+        ttk.Button(self.root, text="Add Files", command=self.add_files, bootstyle=INFO).pack(pady=10, padx=20)
+        ttk.Button(self.root, text="Combine Files", command=self.combine_files, bootstyle=SUCCESS).pack(pady=10, padx=20)
+        ttk.Button(self.root, text="Clear", command=self.clear_files, bootstyle=WARNING).pack(pady=10, padx=20)
+        ttk.Button(self.root, text="Exit", command=self.root.destroy, bootstyle=DANGER).pack(pady=10, padx=20)
 
-        # Listbox with Scrollbar
-        self.listbox = Listbox(upload_frame, height=6)
-        self.listbox.grid(row=0, column=0, padx=10)
-        scrollbar = ttk.Scrollbar(upload_frame, orient="vertical",
-                                  command=self.listbox.yview)
-        scrollbar.grid(row=0, column=1, sticky="ns")
-        self.listbox.config(yscrollcommand=scrollbar.set)
-
-        # Upload Button
-        ttk.Button(upload_frame, text="Upload Files",
-                   command=self.upload_files, bootstyle="info").grid(row=0,
-                                                                     column=2,
-                                                                     padx=(
-                                                                     10, 0))
-
-        # Records Label
-        self.records_label = ttk.Label(file_frame, text="Records: N/A",
-                                       font=("Helvetica", 12, "bold"),
-                                       bootstyle="secondary", anchor="w")
-        self.records_label.grid(row=1, column=0, padx=(10, 0), pady=10)
-
-        # Combine Files Button
-        ttk.Button(self.root, text="Combine Files", command=self.combine_files,
-                   bootstyle="success").grid(row=2, column=0, columnspan=2,
-                                             pady=20, padx=10)
-
-        # Button Frame for Clear and Exit
-        button_frame = ttk.Frame(self.root)
-        button_frame.grid(row=3, column=0, columnspan=2, pady=10, padx=20,
-                          sticky="ew")
-
-        ttk.Button(button_frame, text="Clear", command=self.clear,
-                   bootstyle="warning").grid(row=0, column=0, padx=5,
-                                             sticky="ew")
-        ttk.Button(button_frame, text="Exit", command=self.root.destroy,
-                   bootstyle="danger").grid(row=0, column=1, padx=5,
-                                            sticky="ew")
-
-    def upload_files(self):
-        files = filedialog.askopenfilenames(title="Select Excel Files",
-                                            filetypes=[("Excel files",
-                                                        "*.xlsx *.xls")])
+    def add_files(self):
+        files = filedialog.askopenfilenames(title="Select Excel Files", filetypes=[("Excel files", "*.xlsx *.xls")])
         if files:
-            self.file_paths = list(files)
-            self.listbox.delete(0, 'end')
             for file in files:
-                self.listbox.insert('end', os.path.basename(file))
-            self.update_record_count()
-
-    def update_record_count(self):
-        total_records = 0
-        try:
-            for file in self.file_paths:
-                df = pd.read_excel(file)
-                total_records += len(df)
-            self.records_label.config(text=f"Records: {total_records}")
-        except Exception as e:
-            messagebox.showerror("Error",
-                                 f"Could not read one of the files: {e}")
-            self.records_label.config(text="Records: N/A")
-
-    def clear(self):
-        self.file_paths = []
-        self.listbox.delete(0, 'end')
-        self.records_label.config(text="Records: N/A")
+                if file not in self.file_paths:
+                    self.file_paths.append(file)
+                    self.listbox.insert("end", os.path.basename(file))
 
     def combine_files(self):
-        combined_df = pd.DataFrame()
-        try:
-            for file in self.file_paths:
-                df = pd.read_excel(file)
-                combined_df = pd.concat([combined_df, df])
-            combined_df.sort_values(by=["RegNum"], inplace=True)
-            combined_df.drop(columns=["Email"], inplace=True, errors='ignore')
-            save_path = filedialog.asksaveasfilename(defaultextension=".xlsx",
-                                                     initialfile="combined_file.xlsx")
-            combined_df.to_excel(save_path, index=False)
-            messagebox.showinfo("Success",
-                                "Files have been combined and saved successfully.")
-        except Exception as e:
-            messagebox.showerror("Error",
-                                 f"An error occurred while combining the files: {e}")
+        if not self.file_paths:
+            messagebox.showwarning("Warning", "No files selected.")
+            return
+
+        combined_df = pd.concat((pd.read_excel(file) for file in self.file_paths), ignore_index=True)
+
+        # Remove 'Email' and 'Date' columns if they exist
+        for column in ['Email', 'Date']:
+            if column in combined_df.columns:
+                combined_df.drop(columns=[column], inplace=True)
+
+        # Sort by 'RegNum' column if it exists
+        if 'RegNum' in combined_df.columns:
+            combined_df.sort_values(by='RegNum', inplace=True)
+
+        # Ask for the file name and save the file
+        output_file = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
+        if output_file:
+            try:
+                self.save_combined_file(output_file, combined_df)
+                messagebox.showinfo("Success", f"Files combined and saved to {output_file}")
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred while saving the combined file: {e}")
+
+    def save_combined_file(self, output_file, combined_df):
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Combined Data"
+
+        # Append the combined dataframe to the worksheet
+        for r in dataframe_to_rows(combined_df, index=False, header=True):
+            ws.append(r)
+
+        # Determine the range of cells with data
+        max_row = ws.max_row
+        max_col = ws.max_column
+
+        # Define the table range dynamically
+        table_range = f"A1:{ws.cell(row=max_row, column=max_col).coordinate}"
+
+        # Define the table in the worksheet with the dynamic range
+        table = Table(displayName="CombinedTable", ref=table_range)
+
+        # Define the style for the table
+        style = TableStyleInfo(
+            name="TableStyleMedium18",
+            showFirstColumn=False,
+            showLastColumn=False,
+            showRowStripes=True,
+            showColumnStripes=False
+        )
+        table.tableStyleInfo = style
+
+        # Add the table to the worksheet
+        ws.add_table(table)
+
+        # Save the workbook
+        wb.save(output_file)
+
+    def clear_files(self):
+        self.file_paths = []
+        self.listbox.delete(0, "end")
+
 
 
 if __name__ == "__main__":
