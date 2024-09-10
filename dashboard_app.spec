@@ -5,7 +5,7 @@ a = Analysis(
     ['dashboard_app.py'],
     pathex=[],
     binaries=[],
-    datas=[('uploads/logo1.png', 'uploads')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['icon.ico'],
+    icon=['app_icon.ico'],
 )
